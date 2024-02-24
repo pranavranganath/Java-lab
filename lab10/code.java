@@ -1,14 +1,37 @@
 class Q {
     int n;
+    boolean valueSet = false;
 
     synchronized int get() {
+        while (!valueSet)
+            try {
+                System.out.println("\nConsumer waiting\n");
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException caught");
+            }
+
         System.out.println("Got: " + n);
+        valueSet = false;
+        System.out.println("\nIntimate Producer\n");
+        notify();
         return n;
     }
 
     synchronized void put(int n) {
+        while (valueSet)
+            try {
+                System.out.println("\nProducer waiting\n");
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException caught");
+            }
+
         this.n = n;
+        valueSet = true;
         System.out.println("Put: " + n);
+        System.out.println("\nIntimate Consumer\n");
+        notify();
     }
 }
 
@@ -45,6 +68,7 @@ class Consumer implements Runnable {
         int i = 0;
         while (i < 15) {
             int r = q.get();
+            System.out.println("consumed:" + r);
             i++;
             try {
                 Thread.sleep(1500); // Simulate some delay between each get operation
@@ -55,7 +79,7 @@ class Consumer implements Runnable {
     }
 }
 
-public class PC {
+public class PCFixed {
     public static void main(String args[]) {
         Q q = new Q();
         new Producer(q);
