@@ -26,6 +26,7 @@ class Book {
 
 public class lab3 {
     public static void main(String args[]) {
+        System.out.println("Enter the number of books in record");
         Scanner s = new Scanner(System.in);
         int n;
         
